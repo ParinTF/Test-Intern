@@ -15,7 +15,7 @@ const testConnection = async () => {
     console.error('❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้:');
     console.error(error); // แสดง error แบบละเอียด
   } finally {
-    // 3. ปิดการเชื่อมต่อหลังทดสอบเสร็จ
+    // 3. ปิดการเชื่อมต่อหลังทดสอบเสร็จ 
     await sequelize.close();
   }
 };
