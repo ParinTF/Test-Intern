@@ -7,3 +7,5 @@ sequelize = ORM (Object-Relational Mapping) เป็นเครื่องม
 cors = จัดการสิทธิ์ให้ Frontend เรียกใช้ API ของ Backend ได้ (เป็นยามเปิดประตู)
 dotenv = โหลดข้อมูลสำคัญจากไฟล์ .env เพื่อความปลอดภัย
 pg-hstore = ตัวเสริมให้ sequelize เข้าใจชนิดข้อมูล HSTORE ของ PostgreSQ(เป็นพจนานุกรมเฉพาะทาง)
+bcrypt = สำหรับแฮช (hash) รหัสผ่าน
+jsonwebtoken (หรือ jwt) = สำหรับสร้างและตรวจสอบ JSON Web Tokens

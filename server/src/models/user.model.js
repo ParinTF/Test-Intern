@@ -22,10 +22,6 @@ const User = sequelize.define('User', {
   birthDate: {
     type: DataTypes.DATEONLY,
   },
-  isActive: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
-  },
   username: {
     type: DataTypes.STRING,
     unique: true,
