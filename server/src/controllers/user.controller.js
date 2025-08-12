@@ -2,6 +2,7 @@
 const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const { Op } = require('sequelize'); // สำหรับการค้นหาผู้ใช้
 // ดึงผู้ใช้งานทั้งหมด
 
 const JWT_SECRET = process.env.JWT_SECRET;
