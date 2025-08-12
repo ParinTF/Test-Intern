@@ -13,7 +13,9 @@ module.exports = (req, res, next) => {
     const token = parts[1];
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.userId = decoded.id; // Assuming the token contains user ID
+        console.log('Decoded token:', decoded);
+        req.userId = decoded.id;
+        console.log('User ID from token:', req.userId);
         next();
     } catch (error) {
         return res.status(401).json({ message: 'invalid token' });

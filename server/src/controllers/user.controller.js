@@ -83,9 +83,41 @@ exports.login = async (req, res) => {
       birthDate: user.birthDate,
       username: user.username
     };
+
     res.status(200).json({ message: 'Login successful', token, user: safeUser });
   } catch (error) {
     res.status(500).json({ message: 'Error logging in', error });
+  }
+};
+
+exports.searchUser = async (req, res) => {
+  try {
+    let { username } = req.query;
+    if (!username) {
+      return res.status(400).json({ message: 'Username query parameter is required' });
+    }
+
+    username = String(username).trim();
+    if (username.length > 100) {
+      return res.status(400).json({ message: 'Username query parameter is too long' });
+    }
+    const user = await User.findOne({ where: { username: { [Op.like]: username } },
+      attributes: ['id', 'firstName', 'lastName', 'cardId', 'birthDate', 'username']
+    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const safeUser = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      cardId: user.cardId,
+      birthDate: user.birthDate,
+      username: user.username
+    };
+    res.status(200).json(safeUser);
+  } catch (error) {
+    res.status(500).json({ message: 'Error searching user', error });
   }
 };
 
@@ -125,5 +157,22 @@ exports.updateUser = async (req, res) => {
         res.status(500).json({ message: 'Error updating user', error });
     }
 };
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleted = await User.destroy({
+            where: { id }
+        });
+
+        if (deleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting user', error });
+    }
+}
 
 
