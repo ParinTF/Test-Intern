@@ -9,3 +9,6 @@ dotenv = โหลดข้อมูลสำคัญจากไฟล์ .env
 pg-hstore = ตัวเสริมให้ sequelize เข้าใจชนิดข้อมูล HSTORE ของ PostgreSQ(เป็นพจนานุกรมเฉพาะทาง)
 bcrypt = สำหรับแฮช (hash) รหัสผ่าน
 jsonwebtoken (หรือ jwt) = สำหรับสร้างและตรวจสอบ JSON Web Tokens
+socket.io
+
+express pg sequelize cors dotenv pg-hstore bcrypt jsonwebtoken cookie-parsan socket.io
