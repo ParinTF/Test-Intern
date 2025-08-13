@@ -1,56 +1,49 @@
-// server.js
-
-// 1. IMPORT DEPENDENCIES และ MODULES ที่จำเป็น
-// ----------------------------------------------------------------
-require('dotenv').config(); // โหลดค่าจากไฟล์ .env เข้าสู่ process.env เป็นอันดับแรกเสมอ
+// 1. IMPORT DEPENDENCIES
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const sequelize = require('./src/config/database'); // Import instance ของ sequelize ที่ตั้งค่าไว้แล้ว
-const userRoutes = require('./src/routes/user.routes'); // Import router สำหรับจัดการผู้ใช้
+const http = require('http');
+const sequelize = require('./src/config/database');
+const userRoutes = require('./src/routes/user.routes');
+const { initializeSocket } = require('./src/socket-manager'); // << แก้ไขตรงนี้: import ตัว initialize
+const cookieParser = require('cookie-parser'); //import cookie-parser
+require('./src/models/user.model');
 
-// Import Models เพื่อให้ Sequelize รู้จักและสามารถ sync ได้
-require('./src/models/user.model'); 
-
-
-// 2. INITIALIZE EXPRESS APP
-// ----------------------------------------------------------------
+// 2. INITIALIZE APP & SERVER
 const app = express();
-
+const server = http.createServer(app);
 
 // 3. CONFIGURE MIDDLEWARE
-// ----------------------------------------------------------------
-app.use(cors()); // อนุญาตให้ Frontend (จากคนละ Origin) เรียกใช้ API ได้
-app.use(express.json()); // ทำให้ Express สามารถอ่านและแปลง Request Body ที่เป็น JSON ได้ (จำเป็นสำหรับ req.body)
+app.use(cors({
+  origin: 'http://localhost:5173', // Your React app's URL
+  credentials: true, // Important for cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.use(express.json());
+app.use(cookieParser());
+// 4. CONFIGURE SOCKET.IO
+initializeSocket(server); // << แก้ไขตรงนี้: เรียกใช้ฟังก์ชันเพื่อเริ่ม Socket.IO
 
-
-// 4. DEFINE ROUTES
-// ----------------------------------------------------------------
-// Route พื้นฐานสำหรับทดสอบว่า Server ทำงานอยู่หรือไม่
+// 5. DEFINE ROUTES
 app.get('/', (req, res) => {
-  res.send('User Management API Server is running...');
+  res.send('User Management API Server with Socket.IO is running...');
 });
-
-// ใช้ User Routes ที่เราสร้างไว้สำหรับทุกเส้นทางที่ขึ้นต้นด้วย /api/users
-// เช่น GET /api/users, POST /api/users/login
 app.use('/api/users', userRoutes);
 
-
-// 5. DATABASE CONNECTION & SERVER STARTUP
-// ----------------------------------------------------------------
-const PORT = process.env.PORT || 5000; // ดึง Port จาก .env หรือใช้ 5000 เป็นค่าเริ่มต้น
-
-// sequelize.sync() จะทำการตรวจสอบ Models ทั้งหมดและสร้างตารางในฐานข้อมูลให้ถ้ายังไม่มี
-// เราจะเริ่มรันเซิร์ฟเวอร์หลังจากที่ฐานข้อมูลพร้อมใช้งานแล้วเท่านั้น
+// 6. DATABASE CONNECTION & SERVER STARTUP
+const PORT = process.env.PORT || 5000;
 sequelize
-  .sync({ force: false }) // force: false หมายถึงจะไม่ลบและสร้างตารางใหม่ทุกครั้งที่รัน
+  .sync({ force: false })
   .then(() => {
     console.log('✅ Database synchronized successfully.');
-    
-    // เริ่มรันเซิร์ฟเวอร์หลังจากที่ฐานข้อมูลพร้อมแล้ว
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`🚀 Server is running on port ${PORT}`);
     });
   })
   .catch((err) => {
     console.error('❌ Unable to synchronize the database:', err);
   });
+
+// 7. EXPORT (ไม่จำเป็นต้อง export อะไรจากไฟล์นี้แล้ว)
+// module.exports = { notifyUserUpdate }; // << ลบบรรทัดนี้ทิ้ง

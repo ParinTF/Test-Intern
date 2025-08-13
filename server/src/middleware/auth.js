@@ -3,21 +3,29 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ message: 'no token provided' });
-    const parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-        return res.status(401).json({ message: 'token error' });
+    console.log('\n\nAuthorization Header:', req.headers.authorization);
+    
+    // 1. ดึง token จาก Authorization Header หรือ cookie
+    const bearerToken = req.headers.authorization?.split(' ')[1];
+    const cookieToken = req.cookies?.token;
+    const token = bearerToken || cookieToken;
+
+    // 2. ถ้าไม่มี token ทั้งใน Header และ cookie ให้ปฏิเสธ
+    if (!token) {
+        return res.status(401).json({ message: 'Authentication failed: No token provided.' });
     }
 
-    const token = parts[1];
     try {
+        // 3. ตรวจสอบความถูกต้องของ token
         const decoded = jwt.verify(token, JWT_SECRET);
-        console.log('Decoded token:', decoded);
+        
+        // 4. เก็บ id ของผู้ใช้ไว้ใน request object
         req.userId = decoded.id;
-        console.log('User ID from token:', req.userId);
+        
+        // ไปยัง middleware หรือ controller ตัวถัดไป
         next();
     } catch (error) {
-        return res.status(401).json({ message: 'invalid token' });
+        console.error('Token verification error:', error);
+        return res.status(401).json({ message: 'Authentication failed: Invalid token.' });
     }
 };

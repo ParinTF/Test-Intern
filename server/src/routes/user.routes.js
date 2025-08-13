@@ -11,4 +11,10 @@ router.post('/', authMiddleware, userController.addUser);
 router.put('/:id', authMiddleware, userController.updateUser);
 router.delete('/:id', authMiddleware, userController.deleteUser);
 
+// router.get('/search', userController.searchUser);
+// router.get('/', userController.getAllUsers);
+// router.post('/', userController.addUser);
+// router.put('/:id', userController.updateUser);
+// router.delete('/:id', userController.deleteUser);
+
 module.exports = router;

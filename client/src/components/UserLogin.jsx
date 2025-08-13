@@ -1,65 +1,68 @@
-import React from 'react'
+import React, { useState } from 'react';
 
-const UserLogin = () => {
-    const [username, setUsername] = React.useState('')
-    const [password, setPassword] = React.useState('')
-    const [error, setError] = React.useState(null)
-    const [loading, setLoading] = React.useState(false)
-    const [success, setSuccess] = React.useState(false)
+const UserLogin = ({ setIsLoggedIn, setToken }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-    const handleLogin = async (e) => {
-        e.preventDefault()
-        setLoading(true)
-        setError(null)
-        setSuccess(false)
-        try {
-            const response = await fetch('http://localhost:5000/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            })
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-            if (!response.ok) {
-                const errorData = await response.json()
-                throw new Error(errorData.message || 'Login failed')
-            }
+    try {
+      const response = await fetch('http://localhost:5000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username, password }),
+      });
 
-            const data = await response.json()
-            setSuccess(true)
-            console.log('Login successful:', data)
-        } catch (err) {
-            setError(err.message)
-        } finally {
-            setLoading(false)
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      const data = await response.json();
+      console.log('Login response:', data); 
+      if (data.token) {
+        setToken(data.token);
+        setIsLoggedIn(true);
+      } else {
+        throw new Error('No token received from server');
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    
-    
+  };
+
   return (
-    <>
     <form onSubmit={handleLogin}>
       <input
         type="text"
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        required
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        required
       />
       <button type="submit" disabled={loading}>
         {loading ? 'Logging in...' : 'Login'}
       </button>
+      {error && <p className="error">{error}</p>}
     </form>
-    {error && <p>{error}</p>}
-    {success && <p>Login successful!</p>}
-    </>
-  )
-}
+  );
+};
 
-export default UserLogin
+export default UserLogin;
