@@ -10,6 +10,7 @@ function App() {
       <div className="App">
         <header className="App-header">
           <UserRegister />
+          <UserList />
         </header>
       </div>
     </>

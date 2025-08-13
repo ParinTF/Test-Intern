@@ -11,7 +11,7 @@ const UserRegister = () => {
     const [loading, setLoading] = React.useState(false)
     const [success, setSuccess] = React.useState(false)
     const handleRegister = async (e) => {
-        e.preventDefault()
+        e.preventDefault() // ป้องกันการรีเฟรชหน้าเมื่อส่งฟอร์ม
         setLoading(true)
         setError(null)
         setSuccess(false)

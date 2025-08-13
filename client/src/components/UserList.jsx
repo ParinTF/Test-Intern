@@ -10,6 +10,7 @@ const UserList = () => {
   const [error, setError] = useState(null); // State สำหรับเก็บข้อความ error
 
   // 2. ใช้ useEffect เพื่อดึงข้อมูลจาก API เมื่อ Component โหลดเสร็จ
+  
   useEffect(() => {
     // 3. สร้างฟังก์ชันเพื่อเรียก API
     const fetchUsers = async () => {
